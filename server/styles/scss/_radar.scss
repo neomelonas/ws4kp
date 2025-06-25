@@ -107,6 +107,15 @@
 
 	.container {
 
+		.tiles {
+			position: absolute;
+			width: 1400px;
+
+			img {
+				vertical-align: middle;
+			}
+		}
+
 		.scroll-area {
 			position: relative;
 		}

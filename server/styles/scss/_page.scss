@@ -23,6 +23,8 @@ body {
 
 	&.kiosk {
 		margin: 0px;
+		overflow: hidden;
+		width: 100vw;
 	}
 }
 
@@ -139,6 +141,10 @@ body {
 	&.wide {
 		max-width: 854px;
 	}
+}
+
+.kiosk #divTwc {
+	max-width: unset;
 }
 
 #divTwcLeft {
@@ -282,7 +288,7 @@ body {
 
 @font-face {
 	font-family: 'Star4000 Large';
-	src: url('../fonts/Star4000 Large.ttf') format('truetype');
+	src: url('../fonts/Star4000 Large.woff') format('woff');
 	font-display: swap;
 }
 
@@ -320,10 +326,6 @@ body {
 	width: unset;
 	height: unset;
 	transform-origin: unset;
-}
-
-.kiosk #divTwc #container {
-	transform-origin: 0 0;
 }
 
 #loading {
@@ -426,10 +428,6 @@ body {
 	}
 }
 
-.kiosk #divTwc {
-	justify-content: unset;
-}
-
 #divTwc:fullscreen #display,
 .kiosk #divTwc #display {
 	position: relative;
@@ -456,6 +454,30 @@ body {
 
 .navButton {
 	cursor: pointer;
+}
+
+#ToggleScanlines {
+	display: inline-block;
+
+	.on {
+		display: none;
+	}
+
+	.off {
+		display: inline-block;
+	}
+
+
+	&.on {
+		.on {
+			display: inline-block;
+		}
+
+		.off {
+			display: none;
+		}
+
+	}
 }
 
 .visible {
@@ -738,7 +760,7 @@ body {
 }
 
 #share-link-copied {
-	color: c.$title-color;
+	color: hsl(60, 100%, 30%);
 	display: none;
 }
 
@@ -750,6 +772,7 @@ body {
 
 	#divQuery,
 	>.info,
+	>.related-links,
 	>.heading,
 	#enabledDisplays,
 	#settings,

@@ -67,6 +67,9 @@ const getWeather = async (latLon, haveDataCallback) => {
 	// update the main process for display purposes
 	populateWeatherParameters(weatherParameters);
 
+	// reset the scroll
+	postMessage({ type: 'current-weather-scroll', method: 'reload' });
+
 	// draw the progress canvas and hide others
 	hideAllCanvases();
 	document.querySelector('#loading').style.display = 'none';
@@ -89,7 +92,7 @@ const updateStatus = (value) => {
 	if (displays[0].status === STATUS.loading) return;
 
 	// calculate first enabled display
-	const firstDisplayIndex = displays.findIndex((display) => display.enabled && display.timing.totalScreens > 0);
+	const firstDisplayIndex = displays.findIndex((display) => display?.enabled && display?.timing?.totalScreens > 0);
 
 	// value.id = 0 is hazards, if they fail to load hot-wire a new value.id to the current display to see if it needs to be loaded
 	// typically this plays out as current conditions loads, then hazards fails.

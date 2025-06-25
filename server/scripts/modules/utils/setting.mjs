@@ -38,6 +38,9 @@ class Setting {
 		if (this.type === 'checkbox' && urlValue !== undefined) {
 			urlState = urlValue === 'true';
 		}
+		if (this.type === 'boolean' && urlValue !== undefined) {
+			urlState = urlValue === 'true';
+		}
 		if (this.type === 'select' && urlValue !== undefined) {
 			urlState = parseFloat(urlValue);
 		}
@@ -189,7 +192,7 @@ class Setting {
 				break;
 			case 'checkbox':
 			default:
-				this.element.checked = newValue;
+				this.element.querySelector('input').checked = newValue;
 		}
 		this.storeToLocalStorage(this.myValue);
 

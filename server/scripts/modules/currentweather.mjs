@@ -14,6 +14,13 @@ import {
 // some stations prefixed do not provide all the necessary data
 const skipStations = ['U', 'C', 'H', 'W', 'Y', 'T', 'S', 'M', 'O', 'L', 'A', 'F', 'B', 'N', 'V', 'R', 'D', 'E', 'I', 'G', 'J'];
 
+const REQUIRED_VALUES = [
+	'windSpeed',
+	'dewpoint',
+	'barometricPressure',
+	'visibility',
+	'relativeHumidity',
+];
 class CurrentWeather extends WeatherDisplay {
 	constructor(navId, elemId) {
 		super(navId, elemId, 'Current Conditions', true);
@@ -42,7 +49,6 @@ class CurrentWeather extends WeatherDisplay {
 				// station observations
 				// eslint-disable-next-line no-await-in-loop
 				observations = await json(`${station.id}/observations`, {
-					cors: true,
 					data: {
 						limit: 2,
 					},
@@ -50,19 +56,31 @@ class CurrentWeather extends WeatherDisplay {
 					stillWaiting: () => this.stillWaiting(),
 				});
 
+				if (observations.features.length === 0) throw new Error(`No features returned for station: ${station.properties.stationIdentifier}, trying next station`);
+
+				// one weather value in the right side column is allowed to be missing. Count them up.
+				// eslint-disable-next-line no-loop-func
+				const valuesCount = REQUIRED_VALUES.reduce((prev, cur) => {
+					const value = observations.features[0].properties?.[cur]?.value;
+					if (value !== null && value !== undefined) return prev + 1;
+					// ceiling is a special case :,-(
+					const ceiling = observations.features[0].properties?.cloudLayers[0]?.base?.value;
+					if (cur === 'ceiling' && ceiling !== null && ceiling !== undefined) return prev + 1;
+					return prev;
+				}, 0);
+
 				// test data quality
 				if (observations.features[0].properties.temperature.value === null
-					|| observations.features[0].properties.windSpeed.value === null
 					|| observations.features[0].properties.textDescription === null
 					|| observations.features[0].properties.textDescription === ''
 					|| observations.features[0].properties.icon === null
-					|| observations.features[0].properties.dewpoint.value === null
-					|| observations.features[0].properties.barometricPressure.value === null) {
+					|| valuesCount < REQUIRED_VALUES.length - 1) {
 					observations = undefined;
-					throw new Error(`Unable to get observations: ${station.properties.stationIdentifier}, trying next station`);
+					throw new Error(`Incomplete data set for: ${station.properties.stationIdentifier}, trying next station`);
 				}
 			} catch (error) {
 				console.error(error);
+				observations = undefined;
 			}
 		}
 		// test for data received
@@ -107,7 +125,7 @@ class CurrentWeather extends WeatherDisplay {
 			icon: { type: 'img', src: this.data.Icon },
 		};
 
-		if (this.data.WindGust) fill['wind-gusts'] = `Gusts to ${this.data.WindGust}`;
+		if (this.data.WindGust !== '-') fill['wind-gusts'] = `Gusts to ${this.data.WindGust}`;
 
 		if (this.data.observations.heatIndex.value && this.data.HeatIndex !== this.data.Temperature) {
 			fill['heat-index-label'] = 'Heat Index:';

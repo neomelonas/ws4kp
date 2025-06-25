@@ -1,4 +1,4 @@
-import { json } from './utils/fetch.mjs';
+import { text } from './utils/fetch.mjs';
 import Setting from './utils/setting.mjs';
 
 let playlist;
@@ -19,18 +19,46 @@ document.addEventListener('DOMContentLoaded', () => {
 	getMedia();
 });
 
+const scanMusicDirectory = async () => {
+        const parseDirectory = async (path, prefix = "") => {
+                const listing = await text(path);
+                const matches = [...listing.matchAll(/href="([^\"]+\.mp3)"/gi)];
+                return matches.map((m) => `${prefix}${m[1]}`);
+        };
+
+        try {
+                let files = await parseDirectory("music/");
+                if (files.length === 0) {
+                        files = await parseDirectory("music/default/", "default/");
+                }
+                return { availableFiles: files };
+        } catch (e) {
+                console.error("Unable to scan music directory");
+                console.error(e);
+                return { availableFiles: [] };
+        }
+};
+
+
 const getMedia = async () => {
-	try {
-		// fetch the playlist
-		const rawPlaylist = await json('playlist.json');
-		// store the playlist
-		playlist = rawPlaylist;
-		// enable the media player
-		enableMediaPlayer();
-	} catch (e) {
-		console.error("Couldn't get playlist");
-		console.error(e);
-	}
+        try {
+                const response = await fetch('playlist.json');
+                if (response.ok) {
+                        playlist = await response.json();
+                } else if (response.status === 404
+                        && response.headers.get('X-Weatherstar') === 'true') {
+                        console.warn("Couldn't get playlist.json, falling back to directory scan");
+                        playlist = await scanMusicDirectory();
+                } else {
+                        console.warn(`Couldn't get playlist.json: ${response.status} ${response.statusText}`);
+                        playlist = { availableFiles: [] };
+                }
+        } catch (e) {
+                console.warn("Couldn't get playlist.json, falling back to directory scan");
+                playlist = await scanMusicDirectory();
+        }
+
+        enableMediaPlayer();
 };
 
 const enableMediaPlayer = () => {
@@ -47,6 +75,9 @@ const enableMediaPlayer = () => {
 		if (mediaPlaying.value === true) {
 			startMedia();
 		}
+		// add the volume control to the page
+		const settingsSection = document.querySelector('#settings');
+		settingsSection.append(mediaVolume.generate());
 	}
 };
 
@@ -79,6 +110,7 @@ const startMedia = async () => {
 	} else {
 		try {
 			await player.play();
+			setTrackName(playlist.availableFiles[currentTrack]);
 		} catch (e) {
 			// report the error
 			console.error('Couldn\'t play music');
@@ -86,6 +118,7 @@ const startMedia = async () => {
 			// set state back to not playing for good UI experience
 			mediaPlaying.value = false;
 			stateChanged();
+			setTrackName('Not playing');
 		}
 	}
 };
@@ -93,6 +126,7 @@ const startMedia = async () => {
 const stopMedia = () => {
 	if (!player) return;
 	player.pause();
+	setTrackName('Not playing');
 };
 
 const stateChanged = () => {
@@ -120,6 +154,25 @@ const randomizePlaylist = () => {
 	playlist.availableFiles = randomPlaylist;
 };
 
+const setVolume = (newVolume) => {
+	if (player) {
+		player.volume = newVolume;
+	}
+};
+
+const mediaVolume = new Setting('mediaVolume', {
+	name: 'Volume',
+	type: 'select',
+	defaultValue: 0.75,
+	values: [
+		[1, '100%'],
+		[0.75, '75%'],
+		[0.50, '50%'],
+		[0.25, '25%'],
+	],
+	changeAction: setVolume,
+});
+
 const initializePlayer = () => {
 	// basic sanity checks
 	if (!playlist.availableFiles || playlist?.availableFiles.length === 0) {
@@ -140,7 +193,9 @@ const initializePlayer = () => {
 
 	// get the first file
 	player.src = `music/${playlist.availableFiles[currentTrack]}`;
+	setTrackName(playlist.availableFiles[currentTrack]);
 	player.type = 'audio/mpeg';
+	setVolume(mediaVolume.value);
 };
 
 const playerCanPlay = async () => {
@@ -160,6 +215,15 @@ const playerEnded = () => {
 	}
 	// update the player source
 	player.src = `music/${playlist.availableFiles[currentTrack]}`;
+	setTrackName(playlist.availableFiles[currentTrack]);
+};
+
+const setTrackName = (fileName) => {
+        const baseName = fileName.split('/').pop();
+        const trackName = decodeURIComponent(
+                baseName.replace(/\.mp3/gi, '').replace(/(_-)/gi, '')
+        );
+        document.getElementById('musicTrack').innerHTML = trackName;
 };
 
 export {

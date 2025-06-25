@@ -1,6 +1,6 @@
 {
 	"name": "ws4kp",
-	"version": "5.21.2",
+	"version": "5.25.3",
 	"description": "Welcome to the WeatherStar 4000+ project page!",
 	"main": "index.mjs",
 	"type": "module",
@@ -23,9 +23,11 @@
 	"homepage": "https://github.com/netbymatt/ws4kp#readme",
 	"devDependencies": {
 		"@aws-sdk/client-cloudfront": "^3.609.0",
+		"@eslint/eslintrc": "^3.3.1",
+		"ajv": "^8.17.1",
 		"del": "^8.0.0",
-		"eslint": "^8.2.0",
-		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint": "^9.0.0",
+		"eslint-config-airbnb-base": "15.0.0",
 		"eslint-plugin-import": "^2.10.0",
 		"gulp": "^5.0.0",
 		"gulp-awspublish": "^8.0.0",
@@ -43,6 +45,7 @@
 		"suncalc": "^1.8.0",
 		"swiped-events": "^1.1.4",
 		"terser-webpack-plugin": "^5.3.6",
+		"webpack": "^5.99.9",
 		"webpack-stream": "^7.0.0"
 	},
 	"dependencies": {

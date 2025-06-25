@@ -20,7 +20,7 @@
 	<meta property="og:image:height" content="627">
 	<link rel="prefetch" href="fonts/Star4000.woff" as="font" type="font/woff" crossorigin>
 	<link rel="prefetch" href="fonts/Star4000 Extended.woff" as="font" type="font/woff" crossorigin>
-	<link rel="prefetch" href="fonts/Star4000 Large.ttf" as="font" type="font/ttf" crossorigin>
+	<link rel="prefetch" href="fonts/Star4000 Large.woff" as="font" type="font/woff" crossorigin>
 	<link rel="prefetch" href="fonts/Star4000 Small.woff" as="font" type="font/woff" crossorigin>
 
   <% if (production) { %>
@@ -145,6 +145,10 @@
 					<img class="navButton off" src="images/nav/ic_volume_off_white_24dp_2x.png" title="Unmute" />
 					<img class="navButton on" src="images/nav/ic_volume_on_white_24dp_2x.png" title="Mute" />
 				</div>
+				<div id="ToggleScanlines">
+					<img class="navButton off" src="images/nav/ic_scanlines_off_white_24dp_2x.png" title="Scan lines on" />
+					<img class="navButton on" src="images/nav/ic_scanlines_on_white_24dp_2x.png" title="Scan lines off" />
+				</div>
         <img id="ToggleFullScreen" class="navButton" src="images/nav/ic_fullscreen_white_24dp_2x.png" title="Enter Fullscreen" />
       </div>
     </div>
@@ -182,6 +186,7 @@
 		Station Id: <span id="spanStationId"></span><br />
 		Radar Id: <span id="spanRadarId"></span><br />
 		Zone Id: <span id="spanZoneId"></span><br />
+		Music: <span id="musicTrack">Not playing</span><br />
 		Ws4kp Version: <span><%- version %></span>
 	</div>
 
