@@ -32,6 +32,7 @@
 		"gulp-concat": "^2.6.1",
 		"gulp-ejs": "^5.1.0",
 		"gulp-file": "^0.4.0",
+		"gulp-html-minifier-terser": "^7.1.0",
 		"gulp-rename": "^2.0.0",
 		"gulp-s3-uploader": "^1.0.6",
 		"gulp-sass": "^6.0.0",
@@ -42,12 +43,12 @@
 		"suncalc": "^1.8.0",
 		"swiped-events": "^1.1.4",
 		"terser-webpack-plugin": "^5.3.6",
-		"webpack-stream": "^7.0.0",
-		"gulp-html-minifier-terser": "^7.1.0"
+		"webpack-stream": "^7.0.0"
 	},
 	"dependencies": {
 		"dotenv": "^16.5.0",
 		"ejs": "^3.1.5",
-		"express": "^5.1.0"
+		"express": "^5.1.0",
+		"pm2": "^6.0.6"
 	}
 }
